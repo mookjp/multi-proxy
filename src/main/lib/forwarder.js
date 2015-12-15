@@ -14,8 +14,12 @@ export default class Forwarder {
   static sendRequest(req) {
     return new Promise((resolve, reject) => {
       // TODO: Investicate about options for http.request
-      if (['_headers', 'method', 'path'].every(key => {req.hasOwnProperty(key)})) {
-        reject('Request does not have requested parameters: headers, method, path');
+      const isFulfilledRequired =
+        ['headers', 'method', 'url'].every(key => {
+          return req.hasOwnProperty(key)
+        });
+      if (!isFulfilledRequired) {
+        reject('Request does not have requested parameters: headers, method, url');
       }
 
       let responseStr = '';
@@ -84,11 +88,11 @@ export default class Forwarder {
     return {
       // TODO: This could be https
       protocol: protocol,
-      host: req.host,
+      host: req.hostname,
       port: req.port,
       method: req.method,
-      path: req.path,
-      headers: req._headers
+      path: req.url,
+      headers: req.headers
     }
   }
 }

@@ -68,7 +68,7 @@ describe('Forwarder', () => {
         protocol: 'http',
         host: mockServerHost,
         port: mockServerPort,
-        path: '/resolve',
+        url: '/resolve',
         method: 'GET',
         headers: {
           "Content-Type": "text/plain"
@@ -87,12 +87,13 @@ describe('Forwarder', () => {
         });
     });
 
-    it('should return reject if response has 5XX response', function(done) {
+    // TODO: reject or return normal response from origin server?
+    it('should return resolve with 500 if response has 5XX response', function(done) {
       const request = {
         protocol: 'http',
         host: mockServerHost,
         port: mockServerPort,
-        path: '/reject',
+        url: '/reject',
         method: 'GET',
         headers: {
           "Content-Type": "text/plain"
@@ -122,7 +123,7 @@ describe('Forwarder', () => {
       protocol: 'http',
       host: mockServerHost,
       port: mockServerPort,
-      path: '/',
+      url: '/',
       method: 'GET',
       headers: {
         "Content-Type": "text/plain"
@@ -158,7 +159,7 @@ describe('Forwarder', () => {
       protocol: 'http',
       host: mockServerHost,
       port: mockServerPort,
-      path: '/',
+      url: '/',
       method: 'GET',
       headers: {
         "Content-Type": "text/plain"
