@@ -39,7 +39,7 @@ export default class Forwarder {
   // TODO: write docs
   // req... request object; this is the original for this library
   // servers ... array having some endpoints e.g. http://localhost:9200/
-  static createSendRequest(req, servers) {
+  static createSendRequests(req, servers) {
     return servers.map(server => {
       const serverUrl = url.parse(server);
       req.protocol = serverUrl.protocol;

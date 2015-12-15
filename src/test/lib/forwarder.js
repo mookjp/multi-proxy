@@ -132,7 +132,7 @@ describe('Forwarder', () => {
 
     // TODO: This could be covered in 'Forwarder#sendRequests'
     it('should return Promise objects for each servers', function() {
-      const sendRequests = Forwarder.createSendRequest(request, servers);
+      const sendRequests = Forwarder.createSendRequests(request, servers);
       expect(sendRequests.length).to.equal(servers.length);
       sendRequests.forEach(request => {
         expect(request instanceof Promise).to.be.true;
@@ -167,12 +167,12 @@ describe('Forwarder', () => {
     };
 
     it('should return a single success response object if status codes are the same', function() {
-      Forwarder.sendRequests(Forwarder.createSendRequest(request, same200ResServers))
+      Forwarder.sendRequests(Forwarder.createSendRequests(request, same200ResServers))
         .then(singleResponse => {
           expect(singleResponse.statusCode).to.not.equal(500);
           expect(singleResponse.statusCode).to.equal(200);
         });
-      Forwarder.sendRequests(Forwarder.createSendRequest(request, same404ResServers))
+      Forwarder.sendRequests(Forwarder.createSendRequests(request, same404ResServers))
         .then(singleResponse => {
           expect(singleResponse.statusCode).to.not.equal(500);
           expect(singleResponse.statusCode).to.equal(404);
@@ -180,7 +180,7 @@ describe('Forwarder', () => {
     });
 
     it('should return a single error response object if status codes are different', function() {
-      Forwarder.sendRequests(Forwarder.createSendRequest(request, differentResServers))
+      Forwarder.sendRequests(Forwarder.createSendRequests(request, differentResServers))
         .then(singleResponse => {
           expect(singleResponse.statusCode).to.equal(500);
         });
