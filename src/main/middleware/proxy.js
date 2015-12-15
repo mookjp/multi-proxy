@@ -1,8 +1,10 @@
 import Forwarder from '../lib/forwarder';
+import Promise from 'bluebird';
 
 export default class Proxy {
 
   constructor(servers, patterns) {
+    this.hasMaster = servers.master ? true : false;
     this.servers = servers;
     this.patterns = patterns;
   }
@@ -16,18 +18,44 @@ export default class Proxy {
    * @param next
    */
   proxyRequest(req, res, next) {
+    if(this.hasMaster) {
+      return this.proxyRequestWithMaster(req, res, next);
+    }
+    return this.proxyRequestWithoutMaster(req, res, next);
+  }
+
+  // TODO: Implement proxy with master
+  // If servers object has master, the response from this proxy should be the same
+  // as master server.
+  proxyRequestWithMaster(req, res, next) {}
+
+  proxyRequestWithoutMaster(req, res, next) {
     const isMatched = this.patterns.some(pattern => {
-      return pattern.test(req.headers.url);
+      return pattern.test(req.url);
     });
 
     if (isMatched) {
-      const requests = Forwarder.createSendRequests(req, this.servers);
+      const requests = Forwarder.createSendRequests(req, this.servers.replica);
       Forwarder.sendRequests(requests)
         .then(singleResponse => {
-          res = singleResponse;
-          return res;
+          // TODO: could be better
+          this.formatHeaders(res, singleResponse).then(success => {
+            next();
+          });
         });
     }
-    next();
+  }
+
+  // TODO: Confirm which header should be overwritten
+  formatHeaders(res, proxyResponse) {
+    return new Promise((resolve, reject) => {
+      try {
+        res.writeHead(proxyResponse.statusCode, proxyResponse.headers);
+        res.end(proxyResponse.body);
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 }
