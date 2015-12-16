@@ -23,15 +23,14 @@ export default class Forwarder {
       }
 
       let responseStr = '';
-      let response = {};
       const forwardRequest = http.request(this.createRequestOption(req), res => {
+        // Create proxy response object
         // TODO: This line could be on Stream API?
-        response.statusCode = res.statusCode;
-        response.headers = res.headers;
+        let proxyResponse = this.createProxyResponse(res);
         res.on('data', (chunk) => { responseStr += chunk });
         res.on('end', () => {
-          response.body = responseStr;
-          resolve(response);
+          proxyResponse.body = responseStr;
+          resolve(proxyResponse);
         });
       });
       forwardRequest.on('error', error => { reject(error) });
@@ -39,6 +38,13 @@ export default class Forwarder {
       forwardRequest.end(req.body || '');
     });
   };
+
+  static createProxyResponse(res) {
+    return {
+      statusCode: res.statusCode,
+      headers: res.headers
+    };
+  }
 
   // TODO: write docs
   // req... request object; this is the original for this library
