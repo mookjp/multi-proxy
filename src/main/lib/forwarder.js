@@ -68,7 +68,6 @@ export default class Forwarder {
   };
 
   static sendRequests(promisedRequests) {
-    // TODO:
     return Promise.all(promisedRequests)
     .then(responses => {
       const statusCodes = responses.map((response) => {
