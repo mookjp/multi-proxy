@@ -14,12 +14,13 @@ export default class Forwarder {
   static sendRequest(req) {
     return new Promise((resolve, reject) => {
       // TODO: Investicate about options for http.request
+      const requiredHeaders = ['headers', 'method', 'url'];
       const isFulfilledRequired =
-        ['headers', 'method', 'url'].every(key => {
+        requiredHeaders.every(key => {
           return req.hasOwnProperty(key)
         });
       if (!isFulfilledRequired) {
-        reject('Request does not have requested parameters: headers, method, url');
+        reject(`Request does not have requested parameters: ${requiredHeaders}`);
       }
 
       let responseStr = '';
