@@ -26,7 +26,7 @@ export default class Forwarder {
       let responseStr = '';
       const forwardRequest = http.request(this.createRequestOption(req), res => {
         // Create proxy response object
-        // TODO: This line could be on Stream API?
+        // TODO: Check status code first on 'data' event, then resolve with status code and writable stream
         let proxyResponse = this.createProxyResponse(res);
         res.on('data', (chunk) => { responseStr += chunk });
         res.on('end', () => {
@@ -61,6 +61,7 @@ export default class Forwarder {
   }
 
   static sendRequests(promisedRequests) {
+    // TODO:
     return Promise.all(promisedRequests)
     .then(responses => {
       const statusCodes = responses.map((response) => {
