@@ -50,7 +50,10 @@ export default class Proxy {
   formatHeaders(res, proxyResponse) {
     return new Promise((resolve, reject) => {
       try {
-        res.writeHead(proxyResponse.statusCode, proxyResponse.headers);
+        Object.keys(proxyResponse.headers).forEach(key => {
+          res.setHeader(key, proxyResponse.headers[key]);
+        });
+        res.writeHead(proxyResponse.statusCode);
         res.end(proxyResponse.body);
         resolve(true);
       } catch (error) {

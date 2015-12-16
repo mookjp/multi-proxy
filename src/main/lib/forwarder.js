@@ -94,7 +94,7 @@ export default class Forwarder {
     return {
       // TODO: This could be https
       protocol: protocol,
-      host: req.hostname,
+      host: req.host,
       port: req.port,
       method: req.method,
       path: req.url,
