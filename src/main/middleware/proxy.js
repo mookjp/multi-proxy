@@ -32,9 +32,9 @@ export default class Proxy {
       const requestToMaster = Forwarder.createSendRequest(req, this.servers.master);
       const requestsToNodes = Forwarder.createSendRequests(req, this.servers.replica);
       Forwarder.sendRequests(requestsToNodes)
-        .then(singleResponse => {
-          Forwarder.sendRequest(requestToMaster).then(responseFromMaster => {
-            this.formatHeaders(res, responseFromMaster);
+        .then(() => {
+          requestToMaster.then(responseFromMaster => {
+            Proxy.formatHeaders(res, responseFromMaster);
             next();
           });
         });
@@ -47,15 +47,15 @@ export default class Proxy {
       Forwarder.sendRequests(requests)
         .then(singleResponse => {
           // TODO: could be better
-          this.formatHeaders(res, singleResponse);
+          Proxy.formatHeaders(res, singleResponse);
           next();
         });
     }
   }
 
-  static isMatchedPath(path) {
+  isMatchedPath(path) {
     return this.patterns.some(pattern => {
-      return pattern.test(req.url);
+      return pattern.test(path);
     });
   }
 
