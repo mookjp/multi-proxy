@@ -42,7 +42,7 @@ const patterns = [
 // Create destination list
 const servers = {
   // master should be a single endpoint
-  //master: `http://localhost:${origPort}`,
+  master: `http://localhost:${origPort}`,
 
   // replica can have several endpoints
   replica: [
