@@ -1,6 +1,5 @@
 import http from 'http';
 import { expect } from 'chai';
-import httpProxy from 'http-proxy';
 import Promise from 'bluebird';
 
 import Forwarder from '../../main/lib/forwarder';
