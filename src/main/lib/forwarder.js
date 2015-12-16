@@ -24,6 +24,7 @@ export default class Forwarder {
         // Create proxy response object
         // TODO: Check status code first on 'data' event, then resolve with status code and writable stream
         let proxyResponse = this.createProxyResponse(res);
+        proxyResponse.isMaster = request.isMaster || false;
         res.on('data', (chunk) => { responseStr += chunk });
         res.on('end', () => {
           proxyResponse.body = responseStr;
@@ -39,7 +40,8 @@ export default class Forwarder {
   static createProxyResponse(res) {
     return {
       statusCode: res.statusCode,
-      headers: res.headers
+      headers: res.headers,
+      isMaster: res.isMaster || false
     };
   }
 
@@ -55,6 +57,15 @@ export default class Forwarder {
       return this.sendRequest(req);
     });
   }
+
+  static createSendRequest(req, server) {
+    const serverUrl = url.parse(server);
+    req.protocol = serverUrl.protocol;
+    req.host = serverUrl.hostname;
+    req.port = serverUrl.port;
+    req.isMaster = true;
+    return this.sendRequest(req);
+  };
 
   static sendRequests(promisedRequests) {
     // TODO:
@@ -74,6 +85,17 @@ export default class Forwarder {
       // TODO: return error code 500(Service internal error)?
       return this.createErrorResponse(null, error);
     });
+  }
+
+  static sendRequstsWithMaster(promisedRequests) {
+    return Promise.all(promisedRequests)
+      .then(responses => {
+        return responses.map(response => response.isMaster)[0];
+      })
+      .catch(error => {
+        // TODO: return error code 500(Service internal error)?
+        return this.createErrorResponse(null, error);
+      });
   }
 
   static createErrorResponse(message, error) {

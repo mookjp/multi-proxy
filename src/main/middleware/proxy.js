@@ -27,7 +27,19 @@ export default class Proxy {
   // TODO: Implement proxy with master
   // If servers object has master, the response from this proxy should be the same
   // as master server.
-  proxyRequestWithMaster(req, res, next) {}
+  proxyRequestWithMaster(req, res, next) {
+    if (this.isMatchedPath(req.url)) {
+      const requestToMaster = Forwarder.createSendRequest(req, this.servers.master);
+      const requestsToNodes = Forwarder.createSendRequests(req, this.servers.replica);
+      Forwarder.sendRequests(requestsToNodes)
+        .then(singleResponse => {
+          Forwarder.sendRequest(requestToMaster).then(responseFromMaster => {
+            this.formatHeaders(res, responseFromMaster);
+            next();
+          });
+        });
+    }
+  }
 
   proxyRequestWithoutMaster(req, res, next) {
     const isMatched = this.patterns.some(pattern => {
@@ -45,8 +57,14 @@ export default class Proxy {
     }
   }
 
+  static isMatchedPath(path) {
+    return this.patterns.some(pattern => {
+      return pattern.test(req.url);
+    });
+  }
+
   // TODO: Confirm which header should be overwritten
-  formatHeaders(res, proxyResponse) {
+  static formatHeaders(res, proxyResponse) {
     try {
       Object.keys(proxyResponse.headers).forEach(key => {
         res.setHeader(key, proxyResponse.headers[key]);

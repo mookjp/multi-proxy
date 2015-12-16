@@ -191,4 +191,10 @@ describe('Forwarder', () => {
 
     });
   });
+
+  describe('Forwarder#createProxyResponse', () => {
+    it('has "isMaster" flag as false if res object does not have isMaster flag', function() {
+      expect(Forwarder.createProxyResponse({}).isMaster).not.to.be.true;
+    });
+  });
 });
