@@ -39,26 +39,22 @@ export default class Proxy {
       Forwarder.sendRequests(requests)
         .then(singleResponse => {
           // TODO: could be better
-          this.formatHeaders(res, singleResponse).then(success => {
-            next();
-          });
+          this.formatHeaders(res, singleResponse);
+          next();
         });
     }
   }
 
   // TODO: Confirm which header should be overwritten
   formatHeaders(res, proxyResponse) {
-    return new Promise((resolve, reject) => {
-      try {
-        Object.keys(proxyResponse.headers).forEach(key => {
-          res.setHeader(key, proxyResponse.headers[key]);
-        });
-        res.writeHead(proxyResponse.statusCode);
-        res.end(proxyResponse.body);
-        resolve(true);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
+    try {
+      Object.keys(proxyResponse.headers).forEach(key => {
+        res.setHeader(key, proxyResponse.headers[key]);
+      });
+      res.writeHead(proxyResponse.statusCode);
+      res.end(proxyResponse.body);
+    } catch (error) {
+      throw new Error('An Error occured while writing response');
+    }
+  };
 }
