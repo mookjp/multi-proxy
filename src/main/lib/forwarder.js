@@ -86,17 +86,6 @@ export default class Forwarder {
     });
   }
 
-  static sendRequstsWithMaster(promisedRequests) {
-    return Promise.all(promisedRequests)
-      .then(responses => {
-        return responses.map(response => response.isMaster)[0];
-      })
-      .catch(error => {
-        // TODO: return error code 500(Service internal error)?
-        return this.createErrorResponse(null, error);
-      });
-  }
-
   static createErrorResponse(message, error) {
     return {
       statusCode: 500,
