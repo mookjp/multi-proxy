@@ -7,10 +7,6 @@ const request = Promise.promisifyAll(Promise.promisify(require('request')));
 
 export default class Forwarder {
 
-  constructor(options) {
-    this.options = _.pick(options, 'patterns', 'endpoints');
-  }
-
   static sendRequest(req) {
     return new Promise((resolve, reject) => {
       // TODO: Investicate about options for http.request
