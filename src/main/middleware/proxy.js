@@ -42,11 +42,7 @@ export default class Proxy {
   }
 
   proxyRequestWithoutMaster(req, res, next) {
-    const isMatched = this.patterns.some(pattern => {
-      return pattern.test(req.url);
-    });
-
-    if (isMatched) {
+    if (this.isMatchedPath(req.url)) {
       const requests = Forwarder.createSendRequests(req, this.servers.replica);
       Forwarder.sendRequests(requests)
         .then(singleResponse => {
