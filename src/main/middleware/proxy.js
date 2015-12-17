@@ -37,6 +37,10 @@ export default class Proxy {
             Proxy.formatHeaders(res, responseFromMaster);
             next();
           });
+        })
+        .catch((errorResponse) => {
+          // TODO: could be better to have an handler or something
+          next(new Error(errorResponse));
         });
     }
   }
@@ -49,6 +53,10 @@ export default class Proxy {
           // TODO: could be better
           Proxy.formatHeaders(res, singleResponse);
           next();
+        })
+        .catch((errorResponse) => {
+          // TODO: could be better to have an handler or something
+          next(new Error(errorResponse));
         });
     }
   }
@@ -62,6 +70,7 @@ export default class Proxy {
   // TODO: Confirm which header should be overwritten
   static formatHeaders(res, proxyResponse) {
     try {
+      // TODO: proxyResponse from master has isMaster as false
       Object.keys(proxyResponse.headers).forEach(key => {
         res.setHeader(key, proxyResponse.headers[key]);
       });
