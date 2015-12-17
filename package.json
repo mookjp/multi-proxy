@@ -7,14 +7,14 @@
   ],
   "author": "mookjp",
   "contributors": [
-      {
-          "name": "mookjp",
-          "email": "mookjpy@gmail.com"
-      }
+    {
+      "name": "mookjp",
+      "email": "mookjpy@gmail.com"
+    }
   ],
   "homepage": "https://github.com/mookjp/multi-proxy",
   "bugs": {
-      "url": "https://github.com/mookjp/multi-proxy/issues"
+    "url": "https://github.com/mookjp/multi-proxy/issues"
   },
   "license": "ISC",
   "main": "dist/main.js",
@@ -25,7 +25,8 @@
     "coverage": "babel-node $(npm bin)/babel-istanbul cover $(npm bin)/_mocha -- --recursive src/test -R spec",
     "example": "$(npm bin)/nodemon --exec babel-node --presets es2015,stage-2 example/app.js",
     "example-debug": "$(npm bin)/nodemon --exec babel-node debug --presets es2015,stage-2 example/app.js",
-    "build": "babel src/main -d dist"
+    "build": "babel src/main -d dist",
+    "coveralls": "babel-node $(npm bin)/babel-istanbul cover $(npm bin)/_mocha --report lcovonly -- --recursive src/test -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "babel": {
     "presets": [
@@ -42,6 +43,7 @@
     "babel-preset-stage-2": "^6.3.13",
     "babel-register": "^6.3.13",
     "chai": "^3.4.1",
+    "coveralls": "^2.11.6",
     "eslint": "^1.10.3",
     "mocha": "^2.3.4",
     "node-inspector": "^0.12.5",
