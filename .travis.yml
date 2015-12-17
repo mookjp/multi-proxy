@@ -2,3 +2,9 @@ language: node_js
 node_js:
     - "4.1"
 after_success: npm run-script coveralls
+deploy:
+  provider: npm
+  email: "mookjpy@gmail.com"
+  api_key: $NPM_API_KEY
+  on:
+    tags: true
