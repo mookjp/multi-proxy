@@ -29,13 +29,6 @@ const serversOnlyReplicas = {
   ]
 };
 
-const serversOnlyReplicasWithDifferentResponse = {
-  replica: [
-    `http://localhost:${firstPort}`,
-    `http://localhost:${secondPort}`
-  ]
-};
-
 const patterns = [
   /^\/my\.index\/my\.type/,
   /^\/another\.index\/another\.type/,
