@@ -1,7 +1,7 @@
 multiproxy
 ==========
 
-[![Build Status](https://travis-ci.org/mookjp/multi-proxy.svg)](https://travis-ci.org/mookjp/multi-proxy) [![Coverage Status](https://coveralls.io/repos/mookjp/multi-proxy/badge.svg?branch=master&service=github)](https://coveralls.io/github/mookjp/multi-proxy?branch=master)
+[![npm version](https://badge.fury.io/js/multi-proxy.svg)](https://badge.fury.io/js/multi-proxy) [![Build Status](https://travis-ci.org/mookjp/multi-proxy.svg)](https://travis-ci.org/mookjp/multi-proxy) [![Coverage Status](https://coveralls.io/repos/mookjp/multi-proxy/badge.svg?branch=master&service=github)](https://coveralls.io/github/mookjp/multi-proxy?branch=master)
 
 ```
         👉💻 👉
