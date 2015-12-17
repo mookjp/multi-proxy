@@ -1,27 +1,38 @@
 {
-  "name": "multiproxy",
-  "version": "1.0.0",
-  "description": "Proxy for multi destinations",
-  "main": "src/main/main.js",
+  "name": "multi-proxy",
+  "version": "0.0.2",
+  "description": "Proxy for multi endpoints",
+  "keywords": [
+    "proxy"
+  ],
+  "author": "mookjp",
+  "contributors": [
+      {
+          "name": "mookjp",
+          "email": "mookjpy@gmail.com"
+      }
+  ],
+  "homepage": "https://github.com/mookjp/multi-proxy",
+  "bugs": {
+      "url": "https://github.com/mookjp/multi-proxy/issues"
+  },
+  "license": "ISC",
+  "main": "dist/main.js",
   "scripts": {
     "start": "$(npm bin)/nodemon --exec babel-node --presets es2015,stage-2 src/main/app.js",
     "test": "$(npm bin)/mocha --compilers js:babel-register --recursive src/test",
     "debug-test": "$(npm bin)/mocha debug --compilers js:babel-register --recursive src/test",
     "coverage": "babel-node $(npm bin)/babel-istanbul cover $(npm bin)/_mocha -- --recursive src/test -R spec",
     "example": "$(npm bin)/nodemon --exec babel-node --presets es2015,stage-2 example/app.js",
-    "example-debug": "$(npm bin)/nodemon --exec babel-node debug --presets es2015,stage-2 example/app.js"
+    "example-debug": "$(npm bin)/nodemon --exec babel-node debug --presets es2015,stage-2 example/app.js",
+    "build": "babel src/main -d dist"
   },
-  "keywords": [
-    "proxy"
-  ],
   "babel": {
     "presets": [
       "es2015",
       "stage-2"
     ]
   },
-  "author": "mookjp",
-  "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.3.17",
     "babel-core": "^6.3.17",
@@ -34,13 +45,13 @@
     "eslint": "^1.10.3",
     "mocha": "^2.3.4",
     "node-inspector": "^0.12.5",
-    "nodemon": "^1.8.1",
-    "request": "^2.67.0"
+    "nodemon": "^1.8.1"
   },
   "dependencies": {
     "bluebird": "^3.0.6",
     "connect": "^3.4.0",
     "request": "^2.67.0",
     "underscore": "^1.8.3"
-  }
+  },
+  "private": false
 }
