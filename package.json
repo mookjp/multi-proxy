@@ -13,9 +13,9 @@
     }
   ],
   "homepage": "https://github.com/mookjp/multi-proxy",
-  "repository" : {
-      "type" : "git",
-      "url" : "https://github.com/npm/npm.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/npm/npm.git"
   },
   "bugs": {
     "url": "https://github.com/mookjp/multi-proxy/issues"
@@ -30,6 +30,10 @@
     "example": "$(npm bin)/nodemon --exec babel-node --presets es2015,stage-2 example/app.js",
     "build": "babel src/main -d dist",
     "coveralls": "babel-node $(npm bin)/babel-istanbul cover $(npm bin)/_mocha --report lcovonly -- --recursive src/test -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+  },
+  "pre-commit": {
+    "run": ["test"],
+    "silent": true
   },
   "babel": {
     "presets": [
@@ -50,7 +54,8 @@
     "eslint": "^1.10.3",
     "mocha": "^2.3.4",
     "node-inspector": "^0.12.5",
-    "nodemon": "^1.8.1"
+    "nodemon": "^1.8.1",
+    "pre-commit": "^1.1.2"
   },
   "dependencies": {
     "bluebird": "^3.0.6",
