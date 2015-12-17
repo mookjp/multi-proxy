@@ -30,9 +30,9 @@ const serversOnlyReplicas = {
 };
 
 const patterns = [
-  /^\/my\.index\/my\.type/,
-  /^\/another\.index\/another\.type/,
-  /^\/nothing/
+  { method: 'GET', path: /^\/my\.index\/my\.type/ },
+  { method: 'GET', path: /^\/another\.index\/another\.type/ },
+  { method: 'GET', path: /^\/nothing/ }
 ];
 
 const contentTypeHtml = 'text/html; charset=utf-8';
@@ -154,15 +154,15 @@ describe('Proxy#isMatchedPath', () => {
   const proxy = new ProxyServer(serversWithMaster, patterns);
 
   it('should return true if matched path was given', function() {
-    expect(proxy.isMatchedPath('/my.index/my.type')).to.be.true;
-    expect(proxy.isMatchedPath('/my.index/my.type/something')).to.be.true;
-    expect(proxy.isMatchedPath('/another.index/another.type')).to.be.true;
-    expect(proxy.isMatchedPath('/another.index/another.type/something')).to.be.true;
+    expect(proxy.isMatchedPattern('GET', '/my.index/my.type')).to.be.true;
+    expect(proxy.isMatchedPattern('GET', '/my.index/my.type/something')).to.be.true;
+    expect(proxy.isMatchedPattern('GET', '/another.index/another.type')).to.be.true;
+    expect(proxy.isMatchedPattern('GET', '/another.index/another.type/something')).to.be.true;
   });
 
   it('should return false if not-matched path was given', function() {
-    expect(proxy.isMatchedPath('/my.index/her.type')).not.to.be.true;
-    expect(proxy.isMatchedPath('/something')).not.to.be.true;
-    expect(proxy.isMatchedPath('/another.index/another/')).not.to.be.true;
+    expect(proxy.isMatchedPattern('GET', '/my.index/her.type')).not.to.be.true;
+    expect(proxy.isMatchedPattern('GET', '/something')).not.to.be.true;
+    expect(proxy.isMatchedPattern('GET', '/another.index/another/')).not.to.be.true;
   });
 });

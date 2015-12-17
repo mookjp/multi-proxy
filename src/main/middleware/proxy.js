@@ -28,7 +28,7 @@ export default class Proxy {
   // If servers object has master, the response from this proxy should be the same
   // as master server.
   proxyRequestWithMaster(req, res, next) {
-    if (this.isMatchedPath(req.url)) {
+    if (this.isMatchedPattern(req.method, req.url)) {
       const requestToMaster = Forwarder.createSendRequest(req, this.servers.master);
       const requestsToNodes = Forwarder.createSendRequests(req, this.servers.replica);
       Forwarder.sendRequests(requestsToNodes)
@@ -46,7 +46,7 @@ export default class Proxy {
   }
 
   proxyRequestWithoutMaster(req, res, next) {
-    if (this.isMatchedPath(req.url)) {
+    if (this.isMatchedPattern(req.method, req.url)) {
       const requests = Forwarder.createSendRequests(req, this.servers.replica);
       Forwarder.sendRequests(requests)
         .then(singleResponse => {
@@ -61,9 +61,10 @@ export default class Proxy {
     }
   }
 
-  isMatchedPath(path) {
+  isMatchedPattern(method, path) {
     return this.patterns.some(pattern => {
-      return pattern.test(path);
+      return pattern.method === method
+          && pattern.path.test(path);
     });
   }
 
