@@ -98,7 +98,7 @@ describe('ProxyServer', () => {
 
   it('should return the response from master server if servers has master', function(done) {
     "use strict";
-    const proxy = new ProxyServer(serversOnlyReplicas, patterns);
+    const proxy = new ProxyServer(serversWithMaster, patterns);
 
     const proxyPort = 9999;
     const app = connect();
