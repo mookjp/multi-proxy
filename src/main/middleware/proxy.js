@@ -44,6 +44,8 @@ export default class Proxy {
             })
             .catch(error => {
               // Ignore the case if the results from replicas do not match with each other
+              // TODO: could be with logger;
+              console.log(JSON.stringify(Proxy.createErrorObject(error)));
             })
         })
         .catch((error) => {
