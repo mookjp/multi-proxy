@@ -24,9 +24,6 @@ export default class Proxy {
     return this.proxyRequestWithoutMaster(req, res, next);
   }
 
-  // TODO: Implement proxy with master
-  // If servers object has master, the response from this proxy should be the same
-  // as master server.
   proxyRequestWithMaster(req, res, next) {
     res.on('end', () => { next() });
 
@@ -49,7 +46,6 @@ export default class Proxy {
             })
         })
         .catch((error) => {
-          // TODO: could be better to have an handler or something
           next(new Error(error));
         });
     }
