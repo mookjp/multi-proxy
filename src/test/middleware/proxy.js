@@ -104,6 +104,7 @@ describe('ProxyServer', () => {
     request(`http://localhost:${proxyPort}/my.index/my.type`, (error, response, body) => {
       expect(error).not.to.exist;
       expect(response.statusCode).to.equal(200);
+      expect(new RegExp(destinationMasterResponseText).test(body)).to.be.true;
       proxyServer.close();
       done();
     });
@@ -125,6 +126,9 @@ describe('ProxyServer', () => {
       expect(error).not.to.exist;
       expect(response.statusCode).to.equal(200);
       expect(response.headers['content-type']).to.equal(contentTypeHtml);
+      const hasEither = new RegExp(destinationFirstResponseText).test(body)
+        || new RegExp(destinationSecondResponseText).test(body);
+      expect(hasEither).to.be.true;
       proxyServer.close();
       done();
     });
