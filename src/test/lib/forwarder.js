@@ -68,7 +68,7 @@ describe('Forwarder', () => {
 
     it('should return Promise objects for each servers', function() {
       const req = {
-        url: 'http://this.is.mock',
+        url: servers[0], // This is not related to the test case
         pipe: (stream) => {
           expect(stream.writable).to.be.true;
         }
