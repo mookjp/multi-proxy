@@ -144,6 +144,9 @@ describe('ProxyServer', () => {
 
     request(`http://localhost:${proxyPort}/nothing`, (error, response, body) => {
       expect(response.statusCode).to.equal(500);
+      // Confirm that response body shows each responses from replicas
+      expect(/200/.test(response.body)).to.be.true;
+      expect(/404/.test(response.body)).to.be.true;
       proxyServer.close();
       done();
     });

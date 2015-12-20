@@ -60,79 +60,20 @@ describe('Forwarder', () => {
     mockServerRerurns404.close();
   });
 
-  describe('Forwarder#sendRequest', () => {
-
-    it('should return resolve if response has 2XX response', function(done) {
-      const request = {
-        protocol: 'http',
-        host: mockServerHost,
-        port: mockServerPort,
-        url: '/resolve',
-        method: 'GET',
-        headers: {
-          "Content-Type": "text/plain"
-        },
-        body: 'this is body to resolving path'
-      };
-
-      Forwarder.sendRequest(request)
-        .then((data) => {
-          expect(data).not.to.be.null;
-          expect(data.statusCode).to.equal(200);
-          done();
-        })
-        .catch((error) => {
-          throw new Error('This test case failed as Promise was rejected: ' + error);
-        });
-    });
-
-    // TODO: reject or return normal response from origin server?
-    it('should return resolve with 500 if response has 5XX response', function(done) {
-      const request = {
-        protocol: 'http',
-        host: mockServerHost,
-        port: mockServerPort,
-        url: '/reject',
-        method: 'GET',
-        headers: {
-          "Content-Type": "text/plain"
-        },
-        body: 'this is body to rejecting path'
-      };
-
-      Forwarder.sendRequest(request)
-        .then((data) => {
-          expect(data).not.to.be.null;
-          expect(data.statusCode).to.equal(500);
-          done();
-        })
-        .catch((error) => {
-          throw new Error('This test case failed as Promise was rejected: ' + error);
-        });
-    });
-  });
-
   describe('Forwarder#createSendRequest', () => {
     const servers = [
       `http://${mockServerHost}:${mockServer200Port}`,
       `http://${mockServerHost}:${mockServer404Port}`
     ];
 
-    const request = {
-      protocol: 'http',
-      host: mockServerHost,
-      port: mockServerPort,
-      url: '/',
-      method: 'GET',
-      headers: {
-        "Content-Type": "text/plain"
-      },
-      body: 'this is body to two servers!'
-    };
-
-    // TODO: This could be covered in 'Forwarder#sendRequests'
     it('should return Promise objects for each servers', function() {
-      const sendRequests = Forwarder.createSendRequests(request, servers);
+      const req = {
+        url: 'http://this.is.mock',
+        pipe: (stream) => {
+          expect(stream.writable).to.be.true;
+        }
+      };
+      const sendRequests = Forwarder.createSendRequests(req, servers);
       expect(sendRequests.length).to.equal(servers.length);
       sendRequests.forEach(request => {
         expect(request instanceof Promise).to.be.true;
@@ -140,60 +81,4 @@ describe('Forwarder', () => {
     });
   });
 
-  describe('Forwarder#sendRequests', () => {
-    const same200ResServers = [
-      `http://${mockServerHost}:${mockServer200Port}`,
-      `http://${mockServerHost}:${mockServer200Port}`
-    ];
-    const same404ResServers = [
-      `http://${mockServerHost}:${mockServer404Port}`,
-      `http://${mockServerHost}:${mockServer404Port}`
-    ];
-    const differentResServers = [
-      `http://${mockServerHost}:${mockServer200Port}`,
-      `http://${mockServerHost}:${mockServer404Port}`
-    ];
-
-    const request = {
-      protocol: 'http',
-      host: mockServerHost,
-      port: mockServerPort,
-      url: '/',
-      method: 'GET',
-      headers: {
-        "Content-Type": "text/plain"
-      },
-      body: 'this is body to two servers!'
-    };
-
-    it('should return a single success response object if status codes are the same', function() {
-      Forwarder.sendRequests(Forwarder.createSendRequests(request, same200ResServers))
-        .then(singleResponse => {
-          expect(singleResponse.statusCode).to.not.equal(500);
-          expect(singleResponse.statusCode).to.equal(200);
-        });
-      Forwarder.sendRequests(Forwarder.createSendRequests(request, same404ResServers))
-        .then(singleResponse => {
-          expect(singleResponse.statusCode).to.not.equal(500);
-          expect(singleResponse.statusCode).to.equal(404);
-        });
-    });
-
-    it('should return a single error response object if status codes are different', function() {
-      Forwarder.sendRequests(Forwarder.createSendRequests(request, differentResServers))
-        .then(singleResponse => {
-          expect(singleResponse.statusCode).to.equal(500);
-        });
-    });
-
-    it.skip('should return a single error response object if error occurred while processing', function() {
-
-    });
-  });
-
-  describe('Forwarder#createProxyResponse', () => {
-    it('has "isMaster" flag as false if res object does not have isMaster flag', function() {
-      expect(Forwarder.createProxyResponse({}).isMaster).not.to.be.true;
-    });
-  });
 });
