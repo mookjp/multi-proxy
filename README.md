@@ -4,7 +4,7 @@ multi-proxy
 [![npm version](https://badge.fury.io/js/multi-proxy.svg)](https://badge.fury.io/js/multi-proxy) [![Build Status](https://travis-ci.org/mookjp/multi-proxy.svg)](https://travis-ci.org/mookjp/multi-proxy) [![Coverage Status](https://coveralls.io/repos/mookjp/multi-proxy/badge.svg?branch=master&service=github)](https://coveralls.io/github/mookjp/multi-proxy?branch=master)
 
 multi-proxy is a simple proxy to send requests to multiple destinations and
-reduce responses to a single response.
+reduces responses to a single response.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -26,8 +26,9 @@ multi-proxy can be used as a connect middleware. You can initialize it with:
 * Patterns to forward a request
 * Destination servers
 
-For example, below code sets up multi-proxy to 3 destination including `master` server. 
-If a request matches the one in patterns, the request is sent to all destinations and responses from them will be reduced the one from `master` server.
+For example, this code sets up multi-proxy to 3 destinations including `master` server. 
+If a request matches the one in patterns, the request is sent to all
+destinations and responses from them will be reduced to the one from `master` server.
 
 ```
 # Initialise proxy with patterns and destinations
@@ -57,7 +58,7 @@ http.createServer(app).listen(8000);
 
 ### master mode
 
-Here is the figure of master mode and code example as it was introduced.
+Here is the figure how it works by master mode and code example as it was introduced.
 
 ```
                       ┌──────────────────┐                             
@@ -122,10 +123,11 @@ http.createServer(app).listen(8000);
 
 ### replica mode
 
-In replica mode, multi-proxy doesn't have `master` server as destinations.
+In replica mode, multi-proxy doesn't have `master` server as a destination.
 
 It has only some replicas as destinations and if every status code from replicas is the same,
-it returns a single response from replica. The response is the one which has been got at first.
+it returns a reduced single response from replicas. The response is the one which has been got at first.
+Requests are sent to all replicas but the response to client is the one.
 
 If every status code is not the same, it returns 500 response to the client.
 
