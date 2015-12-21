@@ -1,22 +1,194 @@
-multiproxy
+multi-proxy
 ==========
 
 [![npm version](https://badge.fury.io/js/multi-proxy.svg)](https://badge.fury.io/js/multi-proxy) [![Build Status](https://travis-ci.org/mookjp/multi-proxy.svg)](https://travis-ci.org/mookjp/multi-proxy) [![Coverage Status](https://coveralls.io/repos/mookjp/multi-proxy/badge.svg?branch=master&service=github)](https://coveralls.io/github/mookjp/multi-proxy?branch=master)
 
+multi-proxy is a simple proxy to send requests to multiple destinations and
+reduce responses to a single response.
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Contents
+
+- [How it works](#how-it-works)
+  - [master mode](#master-mode)
+  - [replica mode](#replica-mode)
+- [Getting started](#getting-started)
+- [Examples](#examples)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+
+## How it works
+
+multi-proxy can be used as a connect middleware. You can initialize it with:
+
+* Patterns to forward a request
+* Destination servers
+
+For example, below code sets up multi-proxy to 3 destination including `master` server. 
+If a request matches the one in patterns, the request is sent to all destinations and responses from them will be reduced the one from `master` server.
+
 ```
-        👉💻 👉
-💻 👉👉        👉👉💻
-        👉💻 👉
+# Initialise proxy with patterns and destinations
+var ProxyServer = require('multi-proxy');
+var serversWithMaster = {
+  master: `http://localhost:3000`,
+  replica: [
+    `http://localhost:3001`,
+    `http://localhost:3002`
+  ]
+};
+var patterns = [
+  { method: 'GET', path: /^\/my\.index\/my\.type/ },
+  { method: 'GET', path: /^\/another\.index\/another\.type/ },
+  { method: 'GET', path: /^\/nothing/ }
+];
+var proxy = new ProxyServer(serversWithMaster, patterns);
+
+# Set up your connect app
+var connect = require('connect');
+var app = connect();
+app.use(proxy.proxyRequest);
+
+var http = require('http');
+http.createServer(app).listen(8000);
 ```
 
-## Run examples
+### master mode
+
+Here is the figure of master mode and code example as it was introduced.
 
 ```
-npm install --global babel-cli
-
-# Run proxy server with origin servers
-babel-node --presets es2015,stage-2 -- example/app.js
-
-# Send request to proxy server
-curl -v -XGET localhost:9999/index/hoge/fuga
+                      ┌──────────────────┐                             
+                      │                  │                             
+                      │      Client      │                             
+                      │                  │                             
+                      └────────▲──┬──────┘                             
+                                  │                                    
+                               │  │  1. POST /something/nice           
+                                  │                                    
+                      ┌────────┴──▼──────┐                             
+                      │                  │                             
+                      │   multi-proxy    │                             
+                      │                  │                             
+                      └────────▲──┬──────┘                             
+                                  │                                    
+ 3. By master mode,            │  │  pattern: {                        
+    only response from master     │    method: "POST",                 
+    will be returned           │  │    pattern: /^\/something/.+/      
+                                  │                                    
+                               │  ▼                                    
+                                Λ                                      
+                               ╱ ╲   2. Only matched request           
+                              ▕   ▏     is forwarded to destinations   
+                               ╲ ╱                                     
+                              ▲ V                                      
+         ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─  │                                      
+        │ ┌─────────────────────┼─────────────────────┐                
+          │                     │                     │                
+┌───────┴─▼────────┐  ┌─────────▼────────┐  ┌─────────▼────────┐       
+│                  │  │                  │  │                  │       
+│      master      │  │    replica_a     │  │    replica_b     │       
+│                  │  │                  │  │                  │       
+└──────────────────┘  └──────────────────┘  └──────────────────┘       
 ```
+
+```
+# Initialise proxy with patterns and destinations
+var ProxyServer = require('multi-proxy');
+var serversWithMaster = {
+  master: `http://localhost:3000`,
+  replica: [
+    `http://localhost:3001`,
+    `http://localhost:3002`
+  ]
+};
+var patterns = [
+  { method: 'GET', path: /^\/my\.index\/my\.type/ },
+  { method: 'GET', path: /^\/another\.index\/another\.type/ },
+  { method: 'GET', path: /^\/nothing/ }
+];
+var proxy = new ProxyServer(serversWithMaster, patterns);
+
+# Set up your connect app
+var connect = require('connect');
+var app = connect();
+app.use(proxy.proxyRequest);
+
+var http = require('http');
+http.createServer(app).listen(8000);
+```
+
+### replica mode
+
+In replica mode, multi-proxy doesn't have `master` server as destinations.
+
+It has only some replicas as destinations and if every status code from replicas is the same,
+it returns a single response from replica. The response is the one which has been got at first.
+
+If every status code is not the same, it returns 500 response to the client.
+
+```
+                          ┌──────────────────┐                             
+                          │                  │                             
+                          │      Client      │                             
+                          │                  │                             
+                          └────────▲──┬──────┘                             
+                                      │                                    
+                                   │  │  1. POST /something/nice           
+                                      │                                    
+                          ┌────────┴──▼──────┐                             
+                          │                  │                             
+                          │   multi-proxy    │                             
+                          │                  │                             
+                          └────────▲──┬──────┘                             
+                                      │                                    
+3. Only if all status code         │  │  pattern: {                        
+   from responses are the same,       │    method: "POST",                 
+   return a response from replicas │  │    pattern: /^\/something/.+/      
+                                      │                                    
+                                   │  ▼                                    
+                                    Λ                                      
+                                   ╱ ╲   2. Only matched request           
+                                  ▕   ▏     is forwarded to destinations   
+                                   ╲ ╱                                     
+                                    V ▲                                    
+                                    │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               
+              ┌─────────────────────┼─────────────────────┐ │              
+              │                     │                     │                
+    ┌─────────▼────────┐  ┌─────────▼────────┐  ┌─────────▼─┴──────┐       
+    │                  │  │                  │  │                  │       
+    │    replica_a     │  │    replica_b     │  │    replica_c     │       
+    │                  │  │                  │  │                  │       
+    └──────────────────┘  └──────────────────┘  └──────────────────┘       
+```
+
+```
+# Initialise proxy with patterns and destinations
+var ProxyServer = require('multi-proxy');
+var serversWithoutMaster = {
+  replica: [
+    `http://localhost:3001`,
+    `http://localhost:3002`
+  ]
+};
+var patterns = [
+  { method: 'GET', path: /^\/my\.index\/my\.type/ },
+  { method: 'GET', path: /^\/another\.index\/another\.type/ },
+  { method: 'GET', path: /^\/nothing/ }
+];
+var proxy = new ProxyServer(serversWithoutMaster, patterns);
+
+# Set up your connect app
+var connect = require('connect');
+var app = connect();
+app.use(proxy.proxyRequest);
+
+var http = require('http');
+http.createServer(app).listen(8000);
+```
+
+## Getting started
+
+## Examples
