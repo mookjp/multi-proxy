@@ -1,1 +1,1 @@
-module.exports = require('./middleware/proxy');
+module.exports = require('./middleware/proxy').default;
