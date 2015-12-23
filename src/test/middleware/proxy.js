@@ -78,11 +78,6 @@ describe('ProxyServer', () => {
     secondServer = http.createServer(destinationSecond).listen(secondPort);
   });
 
-  let app;
-  beforeEach(() => {
-    app = connect();
-  });
-
   after(() => {
     masterServer.close();
     firstServer.close();
@@ -91,13 +86,9 @@ describe('ProxyServer', () => {
 
   it('should return the response from master server if servers has master', function(done) {
     "use strict";
-    const proxy = new ProxyServer(serversWithMaster, patterns);
-
     const proxyPort = 9999;
     const app = connect();
-    app.use((req, res, next) => {
-      proxy.proxyRequest(req, res, next);
-    });
+    app.use(ProxyServer.proxyRequest(serversWithMaster, patterns));
     const proxyServer = http.createServer(app);
     proxyServer.listen(proxyPort);
 
@@ -110,15 +101,11 @@ describe('ProxyServer', () => {
     });
   });
 
-  it('should return the first response if servers have only replicas', function(done) {
+  it('should return the response from replica if servers have only replicas', function(done) {
     "use strict";
-    const proxy = new ProxyServer(serversOnlyReplicas, patterns);
-
     const proxyPort = 9999;
     const app = connect();
-    app.use((req, res, next) => {
-      proxy.proxyRequest(req, res, next);
-    });
+    app.use(ProxyServer.proxyRequest(serversOnlyReplicas, patterns));
     const proxyServer = http.createServer(app);
     proxyServer.listen(proxyPort);
 
@@ -136,13 +123,9 @@ describe('ProxyServer', () => {
 
   it('should return error response from proxy if servers have only replicas and they responded with different status codes', function(done) {
     "use strict";
-    const proxy = new ProxyServer(serversOnlyReplicas, patterns);
-
     const proxyPort = 9999;
     const app = connect();
-    app.use((req, res, next) => {
-      proxy.proxyRequest(req, res, next);
-    });
+    app.use(ProxyServer.proxyRequest(serversOnlyReplicas, patterns));
     const proxyServer = http.createServer(app);
     proxyServer.listen(proxyPort);
 
@@ -158,18 +141,45 @@ describe('ProxyServer', () => {
 });
 
 describe('Proxy#isMatchedPath', () => {
-  const proxy = new ProxyServer(serversWithMaster, patterns);
 
   it('should return true if matched path was given', function() {
-    expect(proxy.isMatchedPattern('GET', '/my.index/my.type')).to.be.true;
-    expect(proxy.isMatchedPattern('GET', '/my.index/my.type/something')).to.be.true;
-    expect(proxy.isMatchedPattern('GET', '/another.index/another.type')).to.be.true;
-    expect(proxy.isMatchedPattern('GET', '/another.index/another.type/something')).to.be.true;
+    expect(ProxyServer.isMatchedPattern(
+      [{ method: 'GET', path: /\/my\.index\/my\.type/ }],
+      'GET',
+      '/my.index/my.type'))
+      .to.be.true;
+    expect(ProxyServer.isMatchedPattern(
+      [{ method: 'GET', path: /\/my\.index\/my\.type\/something/ }],
+      'GET',
+      '/my.index/my.type/something'))
+      .to.be.true;
+    expect(ProxyServer.isMatchedPattern(
+      [{ method: 'GET', path: /\/another\.index\/another\.type/ }],
+      'GET',
+      '/another.index/another.type'))
+      .to.be.true;
+    expect(ProxyServer.isMatchedPattern(
+      [{ method: 'GET', path: /\/another\.index\/another\.type\/something/ }],
+      'GET',
+      '/another.index/another.type/something'))
+      .to.be.true;
   });
 
   it('should return false if not-matched path was given', function() {
-    expect(proxy.isMatchedPattern('GET', '/my.index/her.type')).not.to.be.true;
-    expect(proxy.isMatchedPattern('GET', '/something')).not.to.be.true;
-    expect(proxy.isMatchedPattern('GET', '/another.index/another/')).not.to.be.true;
+    expect(ProxyServer.isMatchedPattern(
+      [{ method: 'GET', path: /\/my\.index\/her\.type/ }],
+      'GET',
+      '/my.index/hertype'))
+      .not.to.be.true;
+    expect(ProxyServer.isMatchedPattern(
+      [{ method: 'GET', path: /\/something$/ }],
+      'GET',
+      '/something/'))
+      .not.to.be.true;
+    expect(ProxyServer.isMatchedPattern(
+      [{ method: 'GET', path: /\/another\.index\/another/ }],
+      'GET',
+      '/something/different'))
+      .not.to.be.true;
   });
 });
