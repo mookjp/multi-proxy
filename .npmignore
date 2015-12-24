@@ -28,3 +28,7 @@ coverage/
 coverage.json
 
 .idea
+
+# Ignore code except for compiled code under dist/ directory.
+src/
+example/
