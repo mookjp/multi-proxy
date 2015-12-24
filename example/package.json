@@ -7,6 +7,6 @@
   "license": "ISC",
   "dependencies": {
     "connect": "^3.4.0",
-    "multi-proxy": "0.0.6"
+    "multi-proxy": "0.0.10"
   }
 }
