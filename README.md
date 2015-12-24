@@ -49,7 +49,7 @@ var proxy = new ProxyServer(serversWithMaster, patterns);
 # Set up your connect app
 var connect = require('connect');
 var app = connect();
-app.use(proxy.proxyRequest);
+app.use(ProxyServer.proxyRequest(servers, patterns));
 
 var http = require('http');
 http.createServer(app).listen(8000);
@@ -116,7 +116,7 @@ var proxy = new ProxyServer(serversWithMaster, patterns);
 # Set up your connect app
 var connect = require('connect');
 var app = connect();
-app.use(proxy.proxyRequest);
+app.use(ProxyServer.proxyRequest(servers, patterns));
 
 var http = require('http');
 http.createServer(app).listen(8000);
@@ -186,7 +186,7 @@ var proxy = new ProxyServer(serversWithoutMaster, patterns);
 # Set up your connect app
 var connect = require('connect');
 var app = connect();
-app.use(proxy.proxyRequest);
+app.use(ProxyServer.proxyRequest(servers, patterns));
 
 var http = require('http');
 http.createServer(app).listen(8000);
