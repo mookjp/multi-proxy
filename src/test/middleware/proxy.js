@@ -138,6 +138,21 @@ describe('ProxyServer', () => {
       done();
     });
   });
+
+  it('should pass next callback if the method and path do not match', function(done) {
+    "use strict";
+    const proxyPort = 9999;
+    const app = connect();
+    app.use(ProxyServer.proxyRequest(serversOnlyReplicas, patterns));
+    const proxyServer = http.createServer(app);
+    proxyServer.listen(proxyPort);
+
+    request(`http://localhost:${proxyPort}/does/not/match`, (error, response, body) => {
+      expect(response.statusCode).to.equal(404);
+      proxyServer.close();
+      done();
+    });
+  });
 });
 
 describe('Proxy#isMatchedPath', () => {

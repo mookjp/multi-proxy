@@ -6,24 +6,31 @@ export default class Proxy {
   static proxyRequest(servers, patterns) {
     if (servers.master) {
       return (req, res, next) => {
-        res.on('end', () => { next() });
+        if (!Proxy.isMatchedPattern(patterns, req.method, req.url)) {
+          next();
+        } else {
+          res.on('end', () => {
+            next()
+          });
 
-        if (Proxy.isMatchedPattern(patterns, req.method, req.url)) {
-          const masterPromises = Forwarder.createSendRequests(req, [servers.master]);
+          const masterPromise = Forwarder.createSendRequests(req, [servers.master])[0];
           const replicaPromises = Forwarder.createSendRequests(req, servers.replica);
-          Forwarder.sendRequests(masterPromises, false)
+          masterPromise
             .then(masterRequest => {
-              Forwarder.sendRequests(replicaPromises, true)
-                .then(replicaSumObj => {
+              Forwarder.sendRequestsWithMaster(replicaPromises)
+                .then(replicaSumObjs => {
                   // TODO: should be to logger
-                  console.log(replicaSumObj);
-                  masterRequest.resume();
-                  masterRequest.pipe(res);
+                  replicaSumObjs.forEach(obj => {
+                    console.log(obj.response.toJSON());
+                  });
+                  masterRequest.requestStream.resume();
+                  masterRequest.requestStream.pipe(res);
                 })
                 .catch(error => {
                   // Ignore the case if the results from replicas do not match with each other
                   // TODO: could be with logger;
                   console.log(JSON.stringify(Proxy.createErrorObject(error)));
+                  throw new Error(error);
                 })
             })
             .catch((error) => {
@@ -34,11 +41,15 @@ export default class Proxy {
     }
 
     return (req, res, next) => {
-      res.on('end', () => { next() });
+      if (!Proxy.isMatchedPattern(patterns, req.method, req.url)) {
+        next();
+      } else {
+        res.on('end', () => {
+          next()
+        });
 
-      if (Proxy.isMatchedPattern(patterns, req.method, req.url)) {
         const requestPromises = Forwarder.createSendRequests(req, servers.replica);
-        Forwarder.sendRequests(requestPromises)
+        Forwarder.sendRequestsWithoutMaster(requestPromises)
           .then(singleRequest => {
             singleRequest.resume();
             singleRequest.pipe(res);

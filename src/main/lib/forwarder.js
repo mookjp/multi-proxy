@@ -52,16 +52,7 @@ export default class Forwarder {
         resObjs.forEach(resObj => {
           resObj.requestStream.destroy();
         });
-        return resObjs.map(resObj => {
-          return resObj.response.toJSON();
-        });
+        return resObjs;
       })
-  }
-
-  static sendRequests(promisedRequests, withMaster=false) {
-    if (withMaster) {
-      return Forwarder.sendRequestsWithMaster(promisedRequests);
-    }
-    return Forwarder.sendRequestsWithoutMaster(promisedRequests);
   }
 }
