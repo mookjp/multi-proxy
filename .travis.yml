@@ -5,9 +5,8 @@ after_success:
   - npm run-script coveralls
   - npm run-script build
 deploy:
-  provider: npm
-  email: "mookjpy@gmail.com"
-  api_key: $NPM_API_KEY
+  provider: script
   skip_cleanup: true
+  script: scripts/deploy.sh
   on:
     tags: true
