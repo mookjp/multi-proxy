@@ -14,7 +14,6 @@ reduces responses to a single response.
   - [master mode](#master-mode)
   - [replica mode](#replica-mode)
 - [Getting started](#getting-started)
-- [Examples](#examples)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -60,39 +59,41 @@ http.createServer(app).listen(8000);
 
 Here is the figure how it works by master mode and code example as it was introduced.
 
+NOTICE: You can see fully example inside `/example` directory of this repository.
+
 ```
-                      ┌──────────────────┐                             
-                      │                  │                             
-                      │      Client      │                             
-                      │                  │                             
-                      └────────▲──┬──────┘                             
-                                  │                                    
-                               │  │  1. POST /something/nice           
-                                  │                                    
-                      ┌────────┴──▼──────┐                             
-                      │                  │                             
-                      │   multi-proxy    │                             
-                      │                  │                             
-                      └────────▲──┬──────┘                             
-                                  │                                    
- 3. By master mode,            │  │  pattern: {                        
-    only response from master     │    method: "POST",                 
-    will be returned           │  │    pattern: /^\/something/.+/      
-                                  │                                    
-                               │  ▼                                    
-                                Λ                                      
-                               ╱ ╲   2. Only matched request           
-                              ▕   ▏     is forwarded to destinations   
-                               ╲ ╱                                     
-                              ▲ V                                      
-         ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─  │                                      
-        │ ┌─────────────────────┼─────────────────────┐                
-          │                     │                     │                
-┌───────┴─▼────────┐  ┌─────────▼────────┐  ┌─────────▼────────┐       
-│                  │  │                  │  │                  │       
-│      master      │  │    replica_a     │  │    replica_b     │       
-│                  │  │                  │  │                  │       
-└──────────────────┘  └──────────────────┘  └──────────────────┘       
+                      ┌──────────────────┐
+                      │                  │
+                      │      Client      │
+                      │                  │
+                      └────────▲──┬──────┘
+                                  │
+                               │  │  1. POST /something/nice
+                                  │
+                      ┌────────┴──▼──────┐
+                      │                  │
+                      │   multi-proxy    │
+                      │                  │
+                      └────────▲──┬──────┘
+                                  │
+ 3. By master mode,            │  │  pattern: {
+    only response from master     │    method: "POST",
+    will be returned           │  │    path: /^\/something/.+/
+                                  │  }
+                               │  ▼
+                                Λ
+                               ╱ ╲   2. Only matched request
+                              ▕   ▏     is forwarded to destinations
+                               ╲ ╱
+                              ▲ V
+         ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─  │
+        │ ┌─────────────────────┼─────────────────────┐
+          │                     │                     │
+┌───────┴─▼────────┐  ┌─────────▼────────┐  ┌─────────▼────────┐
+│                  │  │                  │  │                  │
+│      master      │  │    replica_a     │  │    replica_b     │
+│                  │  │                  │  │                  │
+└──────────────────┘  └──────────────────┘  └──────────────────┘
 ```
 
 ```
@@ -132,38 +133,38 @@ Requests are sent to all replicas but the response to client is the one.
 If every status code is not the same, it returns 500 response to the client.
 
 ```
-                          ┌──────────────────┐                             
-                          │                  │                             
-                          │      Client      │                             
-                          │                  │                             
-                          └────────▲──┬──────┘                             
-                                      │                                    
-                                   │  │  1. POST /something/nice           
-                                      │                                    
-                          ┌────────┴──▼──────┐                             
-                          │                  │                             
-                          │   multi-proxy    │                             
-                          │                  │                             
-                          └────────▲──┬──────┘                             
-                                      │                                    
-3. Only if all status code         │  │  pattern: {                        
-   from responses are the same,       │    method: "POST",                 
-   return a response from replicas │  │    pattern: /^\/something/.+/      
-                                      │                                    
-                                   │  ▼                                    
-                                    Λ                                      
-                                   ╱ ╲   2. Only matched request           
-                                  ▕   ▏     is forwarded to destinations   
-                                   ╲ ╱                                     
-                                    V ▲                                    
-                                    │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               
-              ┌─────────────────────┼─────────────────────┐ │              
-              │                     │                     │                
-    ┌─────────▼────────┐  ┌─────────▼────────┐  ┌─────────▼─┴──────┐       
-    │                  │  │                  │  │                  │       
-    │    replica_a     │  │    replica_b     │  │    replica_c     │       
-    │                  │  │                  │  │                  │       
-    └──────────────────┘  └──────────────────┘  └──────────────────┘       
+                          ┌──────────────────┐
+                          │                  │
+                          │      Client      │
+                          │                  │
+                          └────────▲──┬──────┘
+                                      │
+                                   │  │  1. POST /something/nice
+                                      │
+                          ┌────────┴──▼──────┐
+                          │                  │
+                          │   multi-proxy    │
+                          │                  │
+                          └────────▲──┬──────┘
+                                      │
+3. Only if all status code         │  │  pattern: {
+   from responses are the same,       │    method: "POST",
+   return a response from replicas │  │    path: /^\/something/.+/
+                                      │  }
+                                   │  ▼
+                                    Λ
+                                   ╱ ╲   2. Only matched request
+                                  ▕   ▏     is forwarded to destinations
+                                   ╲ ╱
+                                    V ▲
+                                    │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+              ┌─────────────────────┼─────────────────────┐ │
+              │                     │                     │
+    ┌─────────▼────────┐  ┌─────────▼────────┐  ┌─────────▼─┴──────┐
+    │                  │  │                  │  │                  │
+    │    replica_a     │  │    replica_b     │  │    replica_c     │
+    │                  │  │                  │  │                  │
+    └──────────────────┘  └──────────────────┘  └──────────────────┘
 ```
 
 ```
@@ -193,4 +194,10 @@ http.createServer(app).listen(8000);
 
 ## Getting started
 
-## Examples
+Install this via npm then use as a middleware of [senchalabs/connect](https://github.com/senchalabs/connect).
+
+```
+npm install --save multi-proxy
+```
+
+See fully example inside `/example` directory of this repository.

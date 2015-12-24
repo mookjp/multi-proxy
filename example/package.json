@@ -1,0 +1,12 @@
+{
+  "name": "multi-proxy-example",
+  "version": "1.0.0",
+  "description": "Example of multi-proxy",
+  "main": "app.js",
+  "author": "mookjp",
+  "license": "ISC",
+  "dependencies": {
+    "connect": "^3.4.0",
+    "multi-proxy": "0.0.6"
+  }
+}
