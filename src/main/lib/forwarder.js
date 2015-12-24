@@ -27,7 +27,7 @@ export default class Forwarder {
       const statusCodes = resObjs.map((resObj) => {
         return resObj.response.statusCode;
       });
-      if (_.uniq(statusCodes).length > 1 ) {
+      if (_.uniq(statusCodes).length > 1) {
         resObjs.forEach(resObj => {
           resObj.requestStream.destroy();
         });
