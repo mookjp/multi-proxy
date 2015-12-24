@@ -3,7 +3,7 @@ import connect from 'connect';
 import request from 'request';
 import { expect } from 'chai';
 
-import ProxyServer from '../../main/middleware/proxy';
+import multiProxy from '../../main/middleware/proxy';
 
 let masterServer;
 let firstServer;
@@ -88,7 +88,7 @@ describe('ProxyServer', () => {
     "use strict";
     const proxyPort = 9999;
     const app = connect();
-    app.use(ProxyServer.proxyRequest(serversWithMaster, patterns));
+    app.use(multiProxy(serversWithMaster, patterns));
     const proxyServer = http.createServer(app);
     proxyServer.listen(proxyPort);
 
@@ -105,7 +105,7 @@ describe('ProxyServer', () => {
     "use strict";
     const proxyPort = 9999;
     const app = connect();
-    app.use(ProxyServer.proxyRequest(serversOnlyReplicas, patterns));
+    app.use(multiProxy(serversOnlyReplicas, patterns));
     const proxyServer = http.createServer(app);
     proxyServer.listen(proxyPort);
 
@@ -125,7 +125,7 @@ describe('ProxyServer', () => {
     "use strict";
     const proxyPort = 9999;
     const app = connect();
-    app.use(ProxyServer.proxyRequest(serversOnlyReplicas, patterns));
+    app.use(multiProxy(serversOnlyReplicas, patterns));
     const proxyServer = http.createServer(app);
     proxyServer.listen(proxyPort);
 
@@ -143,7 +143,7 @@ describe('ProxyServer', () => {
     "use strict";
     const proxyPort = 9999;
     const app = connect();
-    app.use(ProxyServer.proxyRequest(serversOnlyReplicas, patterns));
+    app.use(multiProxy(serversOnlyReplicas, patterns));
     const proxyServer = http.createServer(app);
     proxyServer.listen(proxyPort);
 
@@ -152,49 +152,5 @@ describe('ProxyServer', () => {
       proxyServer.close();
       done();
     });
-  });
-});
-
-describe('Proxy#isMatchedPath', () => {
-
-  it('should return true if matched path was given', function() {
-    expect(ProxyServer.isMatchedPattern(
-      [{ method: 'GET', path: /\/my\.index\/my\.type/ }],
-      'GET',
-      '/my.index/my.type'))
-      .to.be.true;
-    expect(ProxyServer.isMatchedPattern(
-      [{ method: 'GET', path: /\/my\.index\/my\.type\/something/ }],
-      'GET',
-      '/my.index/my.type/something'))
-      .to.be.true;
-    expect(ProxyServer.isMatchedPattern(
-      [{ method: 'GET', path: /\/another\.index\/another\.type/ }],
-      'GET',
-      '/another.index/another.type'))
-      .to.be.true;
-    expect(ProxyServer.isMatchedPattern(
-      [{ method: 'GET', path: /\/another\.index\/another\.type\/something/ }],
-      'GET',
-      '/another.index/another.type/something'))
-      .to.be.true;
-  });
-
-  it('should return false if not-matched path was given', function() {
-    expect(ProxyServer.isMatchedPattern(
-      [{ method: 'GET', path: /\/my\.index\/her\.type/ }],
-      'GET',
-      '/my.index/hertype'))
-      .not.to.be.true;
-    expect(ProxyServer.isMatchedPattern(
-      [{ method: 'GET', path: /\/something$/ }],
-      'GET',
-      '/something/'))
-      .not.to.be.true;
-    expect(ProxyServer.isMatchedPattern(
-      [{ method: 'GET', path: /\/another\.index\/another/ }],
-      'GET',
-      '/something/different'))
-      .not.to.be.true;
   });
 });

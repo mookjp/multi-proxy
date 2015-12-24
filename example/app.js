@@ -49,7 +49,7 @@ var servers = {
   ]
 };
 var app = connect();
-app.use(ProxyServer.proxyRequest(servers, patterns));
+app.use(multiProxy(servers, patterns));
 
 var proxyPort = 9999;
 http.createServer(app).listen(proxyPort);
