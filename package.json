@@ -1,6 +1,6 @@
 {
   "name": "multi-proxy",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Proxy for multi endpoints",
   "keywords": [
     "proxy"
