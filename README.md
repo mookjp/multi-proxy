@@ -10,13 +10,23 @@ reduces responses to a single response.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ## Contents
 
+- [Getting started](#getting-started)
 - [How it works](#how-it-works)
   - [master mode](#master-mode)
   - [replica mode](#replica-mode)
-- [Getting started](#getting-started)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+
+## Getting started
+
+Install this via npm then use as a middleware of [senchalabs/connect](https://github.com/senchalabs/connect).
+
+```
+npm install --save multi-proxy
+```
+
+See fully example inside `/example` directory of this repository.
 
 ## How it works
 
@@ -31,7 +41,7 @@ destinations and responses from them will be reduced to the one from `master` se
 
 ```
 # Initialise proxy with patterns and destinations
-var ProxyServer = require('multi-proxy');
+var multiProxy = require('multi-proxy');
 var serversWithMaster = {
   master: `http://localhost:3000`,
   replica: [
@@ -49,7 +59,7 @@ var proxy = new ProxyServer(serversWithMaster, patterns);
 # Set up your connect app
 var connect = require('connect');
 var app = connect();
-app.use(ProxyServer.proxyRequest(servers, patterns));
+app.use(multiProxy(servers, patterns));
 
 var http = require('http');
 http.createServer(app).listen(8000);
@@ -98,7 +108,7 @@ NOTICE: You can see fully example inside `/example` directory of this repository
 
 ```
 # Initialise proxy with patterns and destinations
-var ProxyServer = require('multi-proxy');
+var multiProxy = require('multi-proxy');
 var serversWithMaster = {
   master: `http://localhost:3000`,
   replica: [
@@ -116,7 +126,7 @@ var proxy = new ProxyServer(serversWithMaster, patterns);
 # Set up your connect app
 var connect = require('connect');
 var app = connect();
-app.use(ProxyServer.proxyRequest(servers, patterns));
+app.use(multiProxy(servers, patterns));
 
 var http = require('http');
 http.createServer(app).listen(8000);
@@ -169,7 +179,7 @@ If every status code is not the same, it returns 500 response to the client.
 
 ```
 # Initialise proxy with patterns and destinations
-var ProxyServer = require('multi-proxy');
+var multiProxy = require('multi-proxy');
 var serversWithoutMaster = {
   replica: [
     `http://localhost:3001`,
@@ -181,23 +191,12 @@ var patterns = [
   { method: 'GET', path: /^\/another\.index\/another\.type/ },
   { method: 'GET', path: /^\/nothing/ }
 ];
-var proxy = new ProxyServer(serversWithoutMaster, patterns);
 
 # Set up your connect app
 var connect = require('connect');
 var app = connect();
-app.use(ProxyServer.proxyRequest(servers, patterns));
+app.use(multiProxy(servers, patterns));
 
 var http = require('http');
 http.createServer(app).listen(8000);
 ```
-
-## Getting started
-
-Install this via npm then use as a middleware of [senchalabs/connect](https://github.com/senchalabs/connect).
-
-```
-npm install --save multi-proxy
-```
-
-See fully example inside `/example` directory of this repository.

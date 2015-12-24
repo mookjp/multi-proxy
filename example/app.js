@@ -1,7 +1,7 @@
 var http = require('http');
 var connect = require('connect');
 
-var ProxyServer = require('multi-proxy');
+var multiProxy = require('multi-proxy');
 
 // Create fake destination servers
 var destinationOrig = connect();
