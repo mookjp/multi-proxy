@@ -1,7 +1,9 @@
 language: node_js
 node_js:
     - "4.1"
-after_success: npm run-script coveralls
+after_success:
+  - npm run-script coveralls
+  - npm run-script build
 deploy:
   provider: npm
   email: "mookjpy@gmail.com"
