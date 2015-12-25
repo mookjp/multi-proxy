@@ -54,7 +54,6 @@ var patterns = [
   { method: 'GET', path: /^\/another\.index\/another\.type/ },
   { method: 'GET', path: /^\/nothing/ }
 ];
-var proxy = new ProxyServer(serversWithMaster, patterns);
 
 # Set up your connect app
 var connect = require('connect');
@@ -121,7 +120,6 @@ var patterns = [
   { method: 'GET', path: /^\/another\.index\/another\.type/ },
   { method: 'GET', path: /^\/nothing/ }
 ];
-var proxy = new ProxyServer(serversWithMaster, patterns);
 
 # Set up your connect app
 var connect = require('connect');
@@ -180,7 +178,7 @@ If every status code is not the same, it returns 500 response to the client.
 ```
 # Initialise proxy with patterns and destinations
 var multiProxy = require('multi-proxy');
-var serversWithoutMaster = {
+var servers = {
   replica: [
     `http://localhost:3001`,
     `http://localhost:3002`
