@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { isMatchedPattern } from '../../main/lib/utils';
 
 describe('isMatchedPath', () => {
+  "use strict";
 
   it('should return true if matched path was given', function() {
     expect(isMatchedPattern(

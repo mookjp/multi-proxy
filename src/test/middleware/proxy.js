@@ -38,6 +38,7 @@ const patterns = [
 const contentTypeHtml = 'text/html; charset=utf-8';
 
 describe('ProxyServer', () => {
+  'use strict';
   const destinationMasterResponseText = '\nDestination original!';
   const destinationFirstResponseText = '<html><body>destination first</body></html>';
   const destinationSecondResponseText = '<html><body>destination second</body></html>';
@@ -47,7 +48,6 @@ describe('ProxyServer', () => {
     // Create fake destination servers
     const destinationMaster = connect();
     destinationMaster.use((req, res, next) => {
-      "use strict";
       res.setHeader('Content-Type', contentTypeHtml);
       res.writeHead(200);
       res.end(destinationMasterResponseText);
@@ -55,7 +55,6 @@ describe('ProxyServer', () => {
     });
     const destinationFirst = connect();
     destinationFirst.use((req, res, next) => {
-      "use strict";
       res.setHeader('Content-Type', contentTypeHtml);
       res.writeHead(200);
       res.end(destinationFirstResponseText);
@@ -85,7 +84,6 @@ describe('ProxyServer', () => {
   });
 
   it('should return the response from master server if servers has master', function(done) {
-    "use strict";
     const proxyPort = 9999;
     const app = connect();
     app.use(multiProxy(serversWithMaster, patterns));
@@ -102,7 +100,6 @@ describe('ProxyServer', () => {
   });
 
   it('should return the response from replica if servers have only replicas', function(done) {
-    "use strict";
     const proxyPort = 9999;
     const app = connect();
     app.use(multiProxy(serversOnlyReplicas, patterns));
@@ -122,7 +119,6 @@ describe('ProxyServer', () => {
   });
 
   it('should return error response from proxy if servers have only replicas and they responded with different status codes', function(done) {
-    "use strict";
     const proxyPort = 9999;
     const app = connect();
     app.use(multiProxy(serversOnlyReplicas, patterns));
@@ -140,7 +136,6 @@ describe('ProxyServer', () => {
   });
 
   it('should pass next callback if the method and path do not match', function(done) {
-    "use strict";
     const proxyPort = 9999;
     const app = connect();
     app.use(multiProxy(serversOnlyReplicas, patterns));

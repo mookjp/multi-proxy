@@ -3,6 +3,7 @@ import Forwarder from '../lib/forwarder';
 import { isMatchedPattern, createErrorObject } from '../lib/utils';
 
 export default function multiProxy(servers, patterns) {
+  'use strict';
   if (servers.master) {
     return (req, res, next) => {
       if (!isMatchedPattern(patterns, req.method, req.url)) {
