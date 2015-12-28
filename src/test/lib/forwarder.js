@@ -14,7 +14,7 @@ describe('Forwarder', () => {
 
   let mockServer;
   let mockServerReturns200;
-  let mockServerRerurns404;
+  let mockServerReturns404;
 
   before(() => {
     mockServer = http.createServer((req, res) => {
@@ -43,7 +43,7 @@ describe('Forwarder', () => {
       res.end(`Got your request: ${body} ; And I return 200!!`);
     }).listen(mockServer200Port, mockServerHost);
 
-    mockServerRerurns404 = http.createServer((req, res) => {
+    mockServerReturns404 = http.createServer((req, res) => {
       // TODO: Write response body as a json
       res.writeHead(404, {'Content-Type': 'text/plain'});
       let body = '';
@@ -57,7 +57,7 @@ describe('Forwarder', () => {
   after(() => {
     mockServer.close();
     mockServerReturns200.close();
-    mockServerRerurns404.close();
+    mockServerReturns404.close();
   });
 
   describe('Forwarder#createSendRequest', () => {

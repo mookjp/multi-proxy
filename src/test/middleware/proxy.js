@@ -9,7 +9,7 @@ let masterServer;
 let firstServer;
 let secondServer;
 
-// Stert to listen
+// Start to listen
 const origPort = 4410;
 const firstPort = 4411;
 const secondPort = 4412;
