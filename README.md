@@ -14,6 +14,7 @@ reduces responses to a single response.
 - [How it works](#how-it-works)
   - [master mode](#master-mode)
   - [replica mode](#replica-mode)
+- [Logger](#logger)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -200,3 +201,23 @@ app.use(multiProxy(servers, patterns));
 var http = require('http');
 http.createServer(app).listen(8000);
 ```
+
+## Logger
+
+You can configure your own logging config. See below:
+
+```
+// config is the same as winston config https://github.com/winstonjs/winston
+var loggerConfig = {
+  console: {
+    level: 'verbose'
+  },
+  file: {
+    level: 'info',
+    filename: './tmp/example.log'
+  }
+};
+app.use(multiProxy(servers, patterns, loggerConfig));
+```
+
+The logger is based on [winston](https://github.com/winstonjs/winston).
