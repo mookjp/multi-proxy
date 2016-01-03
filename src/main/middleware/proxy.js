@@ -1,5 +1,5 @@
 import Forwarder from '../lib/forwarder'
-import { isMatchedPattern, createErrorObject } from '../lib/utils'
+import { isMatchedPattern } from '../lib/utils'
 import Logger from '../lib/logger'
 
 export default function multiProxy (servers, patterns, config = null) {
@@ -8,6 +8,11 @@ export default function multiProxy (servers, patterns, config = null) {
   if (servers.master) {
     return (req, res, next) => {
       if (!isMatchedPattern(patterns, req.method, req.url)) {
+        logger.log({
+          message: 'Pattern does not match',
+          requestMethod: req.method,
+          requestUrl: req.url
+        }, 'verbose')
         next()
       } else {
         res.on('end', () => { next() })
@@ -26,15 +31,15 @@ export default function multiProxy (servers, patterns, config = null) {
                 replicaSumObjs.forEach(obj => {
                   logger.log(obj.response.toJSON(), 'verbose')
                 })
-
-                masterRequest.requestStream.resume()
-                masterRequest.requestStream.pipe(res)
               })
               .catch(error => {
                 // Ignore the case if the results from replicas do not match with each other
-                logger.log('Got error while sending a request', 'error')
-                logger.log(error, 'error')
-                next(new Error(error))
+                logger.log('Got error while sending requests to replicas but this wil be ignored', 'info')
+                logger.log(error, 'info')
+              })
+              .finally(() => {
+                masterRequest.requestStream.resume()
+                masterRequest.requestStream.pipe(res)
               })
           })
           .catch(error => {
@@ -48,6 +53,11 @@ export default function multiProxy (servers, patterns, config = null) {
 
   return (req, res, next) => {
     if (!isMatchedPattern(patterns, req.method, req.url)) {
+      logger.log({
+        message: 'Pattern does not match',
+        requestMethod: req.method,
+        requestUrl: req.url
+      }, 'verbose')
       next()
     } else {
       res.on('end', () => {
@@ -64,7 +74,9 @@ export default function multiProxy (servers, patterns, config = null) {
           singleRequest.pipe(res)
         })
         .catch((error) => {
-          next(new Error(JSON.stringify(createErrorObject(error))))
+          logger.log('Got an error while sending a request to replicas', 'error')
+          logger.log(error, 'error')
+          next(new Error(error))
         })
     }
   }

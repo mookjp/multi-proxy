@@ -33,11 +33,13 @@ export default class Forwarder {
         resObjs.forEach(resObj => {
           resObj.requestStream.destroy()
         })
-        let error = new Error('status codes did not match with each other')
+        let error = {
+          message: 'status codes did not match with each other'
+        }
         error.responses = resObjs.map(resObj => {
           return resObj.response
         })
-        throw error
+        throw new Error(JSON.stringify(error))
       }
       // Get a response then abandon other streams
       const result = resObjs.shift()
