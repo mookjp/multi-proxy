@@ -1,7 +1,10 @@
 import Forwarder from '../lib/forwarder'
 import { isMatchedPattern, createErrorObject } from '../lib/utils'
+import Logger from '../lib/logger'
 
-export default function multiProxy (servers, patterns) {
+export default function multiProxy (servers, patterns, config = null) {
+  const logger = config ? new Logger(config) : new Logger()
+
   if (servers.master) {
     return (req, res, next) => {
       if (!isMatchedPattern(patterns, req.method, req.url)) {
@@ -15,17 +18,15 @@ export default function multiProxy (servers, patterns) {
           .then(masterRequest => {
             Forwarder.sendRequestsWithMaster(replicaPromises)
               .then(replicaSumObjs => {
-                // TODO: should be to logger
                 replicaSumObjs.forEach(obj => {
-                  console.log(obj.response.toJSON())
+                  logger.log(obj.response.toJSON(), 'verbose')
                 })
                 masterRequest.requestStream.resume()
                 masterRequest.requestStream.pipe(res)
               })
               .catch(error => {
                 // Ignore the case if the results from replicas do not match with each other
-                // TODO: could be with logger
-                console.log(JSON.stringify(createErrorObject(error)))
+                logger.log(JSON.stringify(createErrorObject(error)), 'error')
                 throw new Error(error)
               })
           })
