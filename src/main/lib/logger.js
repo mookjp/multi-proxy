@@ -3,8 +3,8 @@ import path from 'path'
 import winston from 'winston'
 
 export default class Logger {
-  constructor (config) {
-    if (config.file.filename) {
+  constructor (config = { console: { level: 'info' } }) {
+    if (config.file && config.file.filename) {
       Logger.createLogFile(config.file.filename)
     }
 

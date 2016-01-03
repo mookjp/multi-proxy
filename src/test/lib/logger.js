@@ -22,11 +22,12 @@ function createTmpDir (dirPath) {
 describe('Logger', () => {
   const logPath = path.join(tmpDirPath, 'logfile.log')
   const logMessage = 'this should output log to specified path'
-  const logger = new Logger({
+  const loggerWithFile = new Logger({
     file: {
       filename: logPath
     }
   })
+  const loggerWithoutConfig = new Logger()
 
   before(() => {
     createTmpDir(tmpDirPath)
@@ -37,9 +38,19 @@ describe('Logger', () => {
   })
 
   it('should output log to specified path', () => {
-    logger.log(logMessage, () => {
+    loggerWithFile.log(logMessage, () => {
+      expect(loggerWithFile.transports.hasOwnProperty('console')).to.be.true
+      expect(loggerWithFile.transports.hasOwnProperty('file')).to.be.true
       const logStr = fs.readFileSync(logPath).toString()
       expect(new RegExp(logMessage).test(logStr)).to.be.true
+    })
+  })
+
+  it('should output log to stdout if config was not defined', () => {
+    loggerWithoutConfig.log(logMessage, () => {
+      expect(loggerWithFile.transports.hasOwnProperty('console')).to.be.true
+      expect(loggerWithFile.transports.hasOwnProperty('file')).to.be.false
+      expect(fs.readdirSync(tmpDirPath).length).equals.to(0)
     })
   })
 })
