@@ -62,10 +62,12 @@
     "mocha": "~2.3.4",
     "node-inspector": "~0.12.5",
     "nodemon": "~1.8.1",
-    "pre-commit": "~1.1.2"
+    "pre-commit": "~1.1.2",
+    "winston": "~2.1.1"
   },
   "dependencies": {
     "bluebird": "~3.0.6",
+    "fs-extra": "~0.26.3",
     "request": "~2.67.0",
     "underscore": "~1.8.3"
   },

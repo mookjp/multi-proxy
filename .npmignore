@@ -32,3 +32,4 @@ coverage.json
 # Ignore code except for compiled code under dist/ directory.
 src/
 example/
+tmp/
