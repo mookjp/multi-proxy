@@ -4,8 +4,6 @@ import winston from 'winston'
 
 export default class Logger {
   constructor (config) {
-    this.level = config.level || 'info'
-
     if (config.file.filename) {
       Logger.createLogFile(config.file.filename)
     }
@@ -14,20 +12,8 @@ export default class Logger {
     this.logger = winston.loggers.get('default')
   }
 
-  log (message, level = null) {
-    if (this.logger) {
-      this.logByWinston(message, level || this.level)
-      return
-    }
-    this.logByStdout(message)
-  }
-
-  logByWinston (message, level) {
+  log (message, level = 'info') {
     this.logger.log(level, message)
-  }
-
-  logByStdout (message) {
-    console.log(message)
   }
 
   static createLogFile (logFilePath) {
