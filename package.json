@@ -79,7 +79,10 @@
     },
     "rules": {
       "strict": 2,
-      "padded-blocks": [2, "never"]
+      "padded-blocks": [
+        2,
+        "never"
+      ]
     }
   }
 }
