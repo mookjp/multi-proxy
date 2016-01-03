@@ -49,7 +49,18 @@ var servers = {
   ]
 };
 var app = connect();
-app.use(multiProxy(servers, patterns));
+
+// config is the same as winston config https://github.com/winstonjs/winston
+var loggerConfig = {
+  console: {
+    level: 'verbose'
+  },
+  file: {
+    level: 'info',
+    filename: './tmp/example.log'
+  }
+};
+app.use(multiProxy(servers, patterns, loggerConfig));
 
 var proxyPort = 9999;
 http.createServer(app).listen(proxyPort);
