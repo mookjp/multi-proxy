@@ -16,21 +16,23 @@ export default function multiProxy (servers, patterns, config = null) {
         const replicaPromises = Forwarder.createSendRequests(req, servers.replica)
         masterPromise
           .then(masterRequest => {
+
             Forwarder.sendRequestsWithMaster(replicaPromises)
               .then(replicaSumObjs => {
                 replicaSumObjs.forEach(obj => {
                   logger.log(obj.response.toJSON(), 'verbose')
                 })
+
                 masterRequest.requestStream.resume()
                 masterRequest.requestStream.pipe(res)
               })
               .catch(error => {
                 // Ignore the case if the results from replicas do not match with each other
                 logger.log(JSON.stringify(createErrorObject(error)), 'error')
-                throw new Error(error)
+                next(new Error(error))
               })
           })
-          .catch((error) => {
+          .catch(error => {
             next(new Error(error))
           })
       }
@@ -52,8 +54,7 @@ export default function multiProxy (servers, patterns, config = null) {
           singleRequest.pipe(res)
         })
         .catch((error) => {
-          res.writeHead(500, {'Content-Type': 'application/json'})
-          res.end(JSON.stringify(createErrorObject(error)))
+          next(new Error(JSON.stringify(createErrorObject(error))))
         })
     }
   }

@@ -14,6 +14,9 @@ export default class Forwarder {
           requestStream.pause()
           resolve({requestStream: requestStream, response: response})
         })
+        requestStream.on('error', (error) => {
+          reject(error)
+        })
       })
       req.pipe(requestStream)
       return requestPromise
