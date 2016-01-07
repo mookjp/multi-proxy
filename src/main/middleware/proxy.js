@@ -24,6 +24,11 @@ export default function multiProxy (servers, patterns, config = null) {
         masterPromise
           .then(masterRequest => {
             logger.debug('Got response from master', JSON.stringify(masterRequest.response))
+            if (/^5/.test(masterRequest.response.statusCode)) {
+              masterRequest.requestStream.resume()
+              masterRequest.requestStream.pipe(res)
+              return
+            }
 
             Forwarder.sendRequestsWithMaster(replicaPromises)
               .then(replicaSumObjs => {
