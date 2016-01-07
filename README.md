@@ -207,17 +207,14 @@ http.createServer(app).listen(8000);
 You can configure your own logging config. See below:
 
 ```
-// config is the same as winston config https://github.com/winstonjs/winston
+var LOGTYPE = require('multi-proxy').LOGTYPE;
+
+// level should be the one of levels of https://github.com/nomiddlename/log4js-node
 var loggerConfig = {
-  console: {
-    level: 'verbose'
-  },
-  file: {
-    level: 'info',
-    filename: './tmp/example.log'
-  }
+  type: LOGTYPE.DATEFILE,
+  level: log4js.levels.DEBUG
 };
 app.use(multiProxy(servers, patterns, loggerConfig));
 ```
 
-The logger is based on [winston](https://github.com/winstonjs/winston).
+The logger is based on [log4js-node](https://github.com/nomiddlename/log4js-node)
