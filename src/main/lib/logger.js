@@ -7,7 +7,6 @@ export const LOGTYPE = {
 }
 
 const dateFileConfig = {
-  replaceConsole: true,
   appenders: [
     {
       category: 'multi-proxy',
@@ -20,7 +19,6 @@ const dateFileConfig = {
 }
 
 const consoleConfig = {
-  replaceConsole: true,
   appenders: [
     {
       category: 'multi-proxy',

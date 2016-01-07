@@ -4,7 +4,6 @@ import log4js from 'log4js'
 
 describe('createFinalConfig', () => {
   const defaultConfig = {
-    replaceConsole: true,
     appenders: [
       {
         level: log4js.levels.DEBUG,
@@ -18,7 +17,6 @@ describe('createFinalConfig', () => {
   }
 
   const consoleConfig = {
-    replaceConsole: true,
     appenders: [
       {
         level: log4js.levels.DEBUG,
@@ -29,7 +27,6 @@ describe('createFinalConfig', () => {
   }
 
   const consoleConfigWithInfoLevel = {
-    replaceConsole: true,
     appenders: [
       {
         level: log4js.levels.INFO,
@@ -40,7 +37,6 @@ describe('createFinalConfig', () => {
   }
 
   const dateFileConfigWithInfoLevel = {
-    replaceConsole: true,
     appenders: [
       {
         level: log4js.levels.INFO,
