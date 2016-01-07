@@ -1,9 +1,12 @@
 import http from 'http'
 import connect from 'connect'
+import fs from 'fs'
+import path from 'path'
 import request from 'request'
 import { expect } from 'chai'
 
 import multiProxy from '../../main/middleware/proxy'
+import { defaultLogPath } from '../../main/lib/logger'
 
 let masterServer
 let firstServer
@@ -74,12 +77,23 @@ describe('ProxyServer', () => {
     masterServer = http.createServer(destinationMaster).listen(origPort)
     firstServer = http.createServer(destinationFirst).listen(firstPort)
     secondServer = http.createServer(destinationSecond).listen(secondPort)
+
+    // create default log path
+    try {
+      fs.accessSync(path.dirname(defaultLogPath))
+    } catch (e) {
+      fs.mkdirSync(path.dirname(defaultLogPath))
+    }
   })
 
   after(() => {
     masterServer.close()
     firstServer.close()
     secondServer.close()
+
+    // delete default log path
+    fs.unlinkSync(defaultLogPath)
+    fs.rmdirSync(path.dirname(defaultLogPath))
   })
 
   it('should return the response from master server if servers has master', function (done) {

@@ -6,12 +6,14 @@ export const LOGTYPE = {
   CONSOLE: 'console'
 }
 
+export const defaultLogPath = './logs/multi-proxy'
+
 const dateFileConfig = {
   appenders: [
     {
       category: 'multi-proxy',
       type: 'dateFile',
-      filename: process.env.MULTIPROXY_LOG_PATH || './logs/multi-proxy',
+      filename: process.env.MULTIPROXY_LOG_PATH || defaultLogPath,
       pattern: '-yyyy-MM-dd-hh',
       alwaysIncludePattern: false
     }
