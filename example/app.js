@@ -1,7 +1,9 @@
 var http = require('http');
 var connect = require('connect');
+var log4js = require('log4js');
 
 var multiProxy = require('multi-proxy');
+var LOGTYPE = require('multi-proxy').LOGTYPE;
 
 // Create fake destination servers
 var destinationOrig = connect();
@@ -50,15 +52,10 @@ var servers = {
 };
 var app = connect();
 
-// config is the same as winston config https://github.com/winstonjs/winston
+// level should be the one of levels of https://github.com/nomiddlename/log4js-node
 var loggerConfig = {
-  console: {
-    level: 'verbose'
-  },
-  file: {
-    level: 'info',
-    filename: './tmp/example.log'
-  }
+  type: LOGTYPE.DATEFILE,
+  level: log4js.levels.DEBUG
 };
 app.use(multiProxy(servers, patterns, loggerConfig));
 

@@ -1,27 +1,55 @@
-import fs from 'fs-extra'
-import path from 'path'
-import winston from 'winston'
+import extend from 'extend'
+import log4js from 'log4js'
 
-export default class Logger {
-  constructor (config = { console: { level: 'info' } }) {
-    if (config.file && config.file.filename) {
-      Logger.createLogFile(config.file.filename)
+export const LOGTYPE = {
+  DATEFILE: 'dateFile',
+  CONSOLE: 'console'
+}
+
+const dateFileConfig = {
+  replaceConsole: true,
+  appenders: [
+    {
+      category: 'multi-proxy',
+      type: 'dateFile',
+      filename: process.env.MULTIPROXY_LOG_PATH || './logs/multi-proxy',
+      pattern: '-yyyy-MM-dd-hh',
+      alwaysIncludePattern: false
     }
+  ]
+}
 
-    winston.loggers.add('default', config)
-    this.logger = winston.loggers.get('default')
-  }
-
-  log (message, level = 'info') {
-    this.logger.log(level, message)
-  }
-
-  static createLogFile (logFilePath) {
-    try {
-      fs.accessSync(logFilePath)
-    } catch (error) {
-      fs.mkdirsSync(path.dirname(logFilePath))
-      fs.writeFileSync(logFilePath, '')
+const consoleConfig = {
+  replaceConsole: true,
+  appenders: [
+    {
+      category: 'multi-proxy',
+      type: 'console'
     }
+  ]
+}
+
+export const additionalConfig = {
+  type: LOGTYPE.DATEFILE,
+  level: log4js.levels.DEBUG
+}
+
+export function getLogger (config = additionalConfig) {
+  log4js.configure(createFinalConfig(config))
+  return log4js.getLogger('multi-proxy')
+}
+
+export function createFinalConfig (additionalConfig) {
+  const levelConfig = {
+    appenders: [
+      {
+        level: additionalConfig.level || log4js.levels.DEBUG
+      }
+    ]
   }
+
+  if (additionalConfig.type === LOGTYPE.DATEFILE) {
+    return extend(true, {}, dateFileConfig, levelConfig)
+  }
+  return extend(true, {}, consoleConfig, levelConfig)
 }

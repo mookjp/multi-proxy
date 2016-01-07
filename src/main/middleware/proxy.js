@@ -1,41 +1,41 @@
 import Forwarder from '../lib/forwarder'
 import { isMatchedPattern } from '../lib/utils'
-import Logger from '../lib/logger'
+import { getLogger } from '../lib/logger'
 
 export default function multiProxy (servers, patterns, config = null) {
-  const logger = config ? new Logger(config) : new Logger()
+  const logger = config ? getLogger(config) : getLogger()
 
   if (servers.master) {
     return (req, res, next) => {
       if (!isMatchedPattern(patterns, req.method, req.url)) {
-        logger.log({
-          message: 'Pattern does not match',
-          requestMethod: req.method,
-          requestUrl: req.url
-        }, 'verbose')
+        logger.debug('Pattern does not match',
+          {
+            requestMethod: req.method,
+            requestUrl: req.url
+          }
+        )
         next()
       } else {
         res.on('end', () => { next() })
 
         const masterPromise = Forwarder.createSendRequests(req, [servers.master])[0]
         const replicaPromises = Forwarder.createSendRequests(req, servers.replica)
-        logger.log('Start to send request', 'verbose')
+        logger.debug('Start to send request')
         masterPromise
           .then(masterRequest => {
-            logger.log('Got response from master', 'verbose')
-            logger.log(masterRequest.response.toJSON(), 'verbose')
+            logger.debug('Got response from master', JSON.stringify(masterRequest.response))
 
             Forwarder.sendRequestsWithMaster(replicaPromises)
               .then(replicaSumObjs => {
-                logger.log('Got response from replicas', 'verbose')
-                replicaSumObjs.forEach(obj => {
-                  logger.log(obj.response.toJSON(), 'verbose')
+                const responses = replicaSumObjs.map(obj => {
+                  return obj.response
                 })
+                logger.debug('Got response from replicas', JSON.stringify(responses))
               })
               .catch(error => {
                 // Ignore the case if the results from replicas do not match with each other
-                logger.log('Got error while sending requests to replicas but this wil be ignored', 'info')
-                logger.log(error, 'info')
+                logger.info('Got error while sending requests to replicas but this wil be ignored')
+                logger.info(error)
               })
               .finally(() => {
                 masterRequest.requestStream.resume()
@@ -43,8 +43,7 @@ export default function multiProxy (servers, patterns, config = null) {
               })
           })
           .catch(error => {
-            logger.log('Got an error while sending a request to master', 'error')
-            logger.log(error, 'error')
+            logger.error('Got an error while sending a request to master', error)
             next(new Error(error))
           })
       }
@@ -53,11 +52,11 @@ export default function multiProxy (servers, patterns, config = null) {
 
   return (req, res, next) => {
     if (!isMatchedPattern(patterns, req.method, req.url)) {
-      logger.log({
-        message: 'Pattern does not match',
-        requestMethod: req.method,
-        requestUrl: req.url
-      }, 'verbose')
+      logger.debug('Pattern does not match',
+        {
+          requestMethod: req.method,
+          requestUrl: req.url
+        })
       next()
     } else {
       res.on('end', () => {
@@ -67,15 +66,14 @@ export default function multiProxy (servers, patterns, config = null) {
       const requestPromises = Forwarder.createSendRequests(req, servers.replica)
       Forwarder.sendRequestsWithoutMaster(requestPromises)
         .then(singleRequest => {
-          logger.log('Got response from the one of replicas', 'verbose')
-          logger.log(singleRequest.response.toJSON(), 'verbose')
+          logger.debug('Got response from the one of replicas',
+            JSON.stringify(singleRequest.response))
 
           singleRequest.resume()
           singleRequest.pipe(res)
         })
         .catch((error) => {
-          logger.log('Got an error while sending a request to replicas', 'error')
-          logger.log(error, 'error')
+          logger.error('Got an error while sending a request to replicas', error)
           next(new Error(error))
         })
     }
