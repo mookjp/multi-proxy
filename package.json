@@ -15,7 +15,7 @@
   "homepage": "https://github.com/mookjp/multi-proxy",
   "repository": {
     "type": "git",
-    "url": "https://github.com/npm/npm.git"
+    "url": "https://github.com/mookjp/multi-proxy.git"
   },
   "bugs": {
     "url": "https://github.com/mookjp/multi-proxy/issues"
